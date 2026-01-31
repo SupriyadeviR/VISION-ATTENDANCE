@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+env/
+venv/
+ENV/
+.build/
+
+# Distribution / packaging
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+
+# Data
+face_data/
+uploads/
+uploads/scans/
+backups/
+utils/database/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Virtualenvs inside project
+*/venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Sensitive
+*.pem
+*.key
+
+# Large binaries
+*.dat
+*.pkl
+*.h5
+
+# Local config
+local_settings.py
+
+# Ignore site-packages accidentally added
+site-packages/

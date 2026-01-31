@@ -1,0 +1,244 @@
+/* =========================
+   GLOBAL RESET & THEME
+========================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #f5f7fa;
+    min-height: 100vh;
+}
+
+/* =========================
+   NAVBAR
+========================= */
+.navbar {
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(10px);
+    padding: 15px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+}
+
+.navbar h1 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #00e5ff;
+}
+
+.navbar ul {
+    list-style: none;
+    display: flex;
+    gap: 25px;
+}
+
+.navbar ul li a {
+    text-decoration: none;
+    color: #e0e0e0;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.navbar ul li a:hover {
+    color: #00e5ff;
+}
+
+/* =========================
+   MAIN CONTAINER
+========================= */
+.container {
+    padding: 40px;
+}
+
+/* =========================
+   CARDS
+========================= */
+.card {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 25px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+    transition: 0.4s;
+}
+
+.card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.85);
+}
+
+.card h2 {
+    color: #00e5ff;
+    margin-bottom: 10px;
+}
+
+.card p {
+    color: #cfd8dc;
+}
+
+/* =========================
+   DASHBOARD GRID
+========================= */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+.btn {
+    padding: 12px 22px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #00e5ff, #00bcd4);
+    color: #000;
+    transition: 0.3s;
+}
+
+.btn:hover {
+    transform: scale(1.05);
+    background: linear-gradient(135deg, #00bcd4, #00e5ff);
+}
+
+/* =========================
+   FORMS
+========================= */
+form label {
+    display: block;
+    margin-top: 15px;
+    font-weight: 500;
+}
+
+form input,
+form select {
+    width: 100%;
+    padding: 12px;
+    margin-top: 6px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+}
+
+form input::placeholder {
+    color: #ccc;
+}
+
+/* =========================
+   CAMERA SECTION
+========================= */
+.camera-box {
+    border: 2px dashed #00e5ff;
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+}
+
+.camera-box video {
+    width: 100%;
+    max-width: 420px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+}
+
+/* =========================
+   TABLE (Attendance Logs)
+========================= */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table thead {
+    background: rgba(0,0,0,0.4);
+}
+
+table th,
+table td {
+    padding: 14px;
+    text-align: center;
+}
+
+table tbody tr {
+    background: rgba(255,255,255,0.06);
+    transition: 0.3s;
+}
+
+table tbody tr:hover {
+    background: rgba(0,229,255,0.15);
+}
+
+/* =========================
+   BADGES
+========================= */
+.badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.badge.success {
+    background: #00e676;
+    color: #000;
+}
+
+.badge.fail {
+    background: #ff5252;
+    color: #fff;
+}
+
+/* =========================
+   FOOTER
+========================= */
+.footer {
+    margin-top: 40px;
+    text-align: center;
+    color: #90a4ae;
+    font-size: 14px;
+}
+
+/* =========================
+   ANIMATIONS
+========================= */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.8s ease;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .container {
+        padding: 20px;
+    }
+}

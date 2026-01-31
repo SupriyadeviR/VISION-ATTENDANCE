@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}Biometric Scan | VisionPresence Pro{% endblock %}
+{% block page_title %}📸 Biometric Face Scan{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">Biometric Face Scan</div>
+    <div class="page-subtitle">Scan your face to mark attendance. System will auto-detect time-in or time-out.</div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+    <div class="card">
+        <h3 style="margin-top: 0; display: flex; align-items: center; gap: 10px;">
+            <span>📷</span> Live Camera Feed
+        </h3>
+        <video id="camera" style="width: 100%; border-radius: 8px; background: #000; margin-bottom: 16px;" autoplay playsinline></video>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+            <button class="btn btn-primary" onclick="startCamera()" style="flex: 1;">▶ Start Camera</button>
+            <button class="btn btn-secondary" onclick="stopCamera()" style="flex: 1;">⏹ Stop Camera</button>
+        </div>
+
+        <button class="btn btn-success" onclick="captureAndScan()" style="width: 100%; padding: 14px; font-size: 16px;">
+            ✅ Scan Face & Mark Attendance
+        </button>
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top: 0; display: flex; align-items: center; gap: 10px;">
+            <span>📊</span> Scan Results
+        </h3>
+        <div id="results" style="min-height: 200px; padding: 16px; background: rgba(14, 165, 233, 0.05); border-radius: 8px; border-left: 4px solid var(--accent);">
+            <div style="color: var(--muted); text-align: center;">
+                📭 No scan result yet. Start camera and scan your face.
+            </div>
+        </div>
+
+        <div style="margin-top: 16px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div style="padding: 12px; background: var(--bg-dark); border-radius: 8px;">
+                    <div style="color: var(--muted); font-size: 12px;">Last Scanned</div>
+                    <div id="lastScanned" style="font-weight: 600; margin-top: 4px;">—</div>
+                </div>
+                <div style="padding: 12px; background: var(--bg-dark); border-radius: 8px;">
+                    <div style="color: var(--muted); font-size: 12px;">Recognition Status</div>
+                    <div id="status" style="font-weight: 600; margin-top: 4px; color: var(--muted);">Waiting...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h3 style="margin-top: 0; display: flex; align-items: center; gap: 10px;">
+        <span>⏰</span> Today's Attendance Summary
+    </h3>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Time In</th>
+                    <th>Time Out</th>
+                    <th>Duration</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if today_attendance %}
+                    {% for record in today_attendance %}
+                    <tr>
+                        <td><strong>{{ record.name }}</strong></td>
+                        <td>{{ record.time_in if record.time_in else '—' }}</td>
+                        <td>{% if record.time_out %}{{ record.time_out }}{% else %}🔴 Working{% endif %}</td>
+                        <td>
+                            {% if record.duration is not none %}
+                                {{ record.duration }}h
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if record.time_out %}
+                                <span style="color: var(--success);">✅ Checked Out</span>
+                            {% else %}
+                                <span style="color: var(--warning);">⏳ In Progress</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="5" style="text-align: center; color: var(--muted);">📭 No attendance records for today yet</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const video = document.getElementById('camera');
+    let stream = null;
+
+    async function startCamera() {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { width: { ideal: 1280 }, height: { ideal: 720 } } 
+            });
+            video.srcObject = stream;
+        } catch (err) {
+            alert('❌ Camera access denied or not available: ' + err.message);
+            updateResults('error', 'Camera access failed');
+        }
+    }
+
+    function stopCamera() {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            video.srcObject = null;
+        }
+    }
+
+    async function captureAndScan() {
+        if (!stream) {
+            alert('⚠ Please start camera first');
+            return;
+        }
+
+        try {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0);
+
+            canvas.toBlob(blob => {
+                const formData = new FormData();
+                formData.append('image', blob, 'scan.jpg');
+
+                fetch('/mark_attendance', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        updateResults('success', `✅ ${data.message}`);
+                        document.getElementById('lastScanned').textContent = new Date().toLocaleTimeString();
+                        document.getElementById('status').textContent = '✅ Recognition Successful';
+                        document.getElementById('status').style.color = 'var(--success)';
+                        setTimeout(() => location.reload(), 2000);
+
+                    } else if (data.status === 'need_timeout_confirm') {
+                        // Show confirm Time Out button
+                        document.getElementById('lastScanned').textContent = new Date().toLocaleTimeString();
+                        document.getElementById('status').textContent = '⏳ Awaiting Time Out confirmation';
+                        document.getElementById('status').style.color = 'var(--warning)';
+
+                        const results = document.getElementById('results');
+                        results.innerHTML = `
+                            <div style="font-weight:600; margin-bottom:12px;">${data.message}</div>
+                            <div style="display:flex; gap:8px;">
+                                <button id="confirmTimeoutBtn" class="btn btn-danger">Record Time Out</button>
+                                <button id="cancelTimeoutBtn" class="btn btn-secondary">Cancel</button>
+                            </div>`;
+
+                        document.getElementById('confirmTimeoutBtn').addEventListener('click', () => {
+                            fetch('/confirm_timeout', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ attendance_id: data.attendance_id })
+                            })
+                            .then(r => r.json())
+                            .then(resp => {
+                                if (resp.status === 'success') {
+                                    updateResults('success', `✅ ${resp.message}`);
+                                    document.getElementById('status').textContent = '✅ Checked Out';
+                                    document.getElementById('status').style.color = 'var(--success)';
+                                    setTimeout(() => location.reload(), 1500);
+                                } else {
+                                    updateResults('error', `❌ ${resp.message}`);
+                                }
+                            })
+                            .catch(err => updateResults('error', '❌ ' + err.message));
+                        });
+
+                        document.getElementById('cancelTimeoutBtn').addEventListener('click', () => {
+                            updateResults('error', '⛔ Time Out cancelled');
+                            document.getElementById('status').textContent = '⏳ In Progress';
+                            document.getElementById('status').style.color = 'var(--warning)';
+                        });
+
+                    } else {
+                        updateResults('error', `❌ ${data.message}`);
+                        document.getElementById('status').textContent = '❌ Recognition Failed';
+                        document.getElementById('status').style.color = 'var(--danger)';
+                        setTimeout(() => location.reload(), 2000);
+                    }
+                })
+                .catch(err => {
+                    updateResults('error', '❌ Network error: ' + err.message);
+                    document.getElementById('status').textContent = '❌ Error';
+                });
+            });
+        } catch (err) {
+            updateResults('error', '❌ ' + err.message);
+        }
+    }
+
+    function updateResults(type, message) {
+        const results = document.getElementById('results');
+        const color = type === 'success' ? 'var(--success)' : 'var(--danger)';
+        results.innerHTML = `<div style="color: ${color}; font-weight: 600;">${message}</div>`;
+    }
+
+    // Auto-start camera on page load
+    window.addEventListener('load', startCamera);
+    window.addEventListener('beforeunload', stopCamera);
+</script>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | VisionPresence Pro{% endblock %}
+{% block page_title %}🏠 Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">Welcome Back! 👋</div>
+    <div class="page-subtitle">Your AI-powered attendance management system is running smoothly</div>
+</div>
+
+<div class="grid">
+    <div class="stat-box">
+        <div class="stat-value">{{ total_staff }}</div>
+        <div class="stat-label">👥 Registered Staff</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-value">{{ today_present }}</div>
+        <div class="stat-label">✅ Present Today</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-value">{{ today_absent }}</div>
+        <div class="stat-label">❌ Absent Today</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-value">{{ week_attendance }}%</div>
+        <div class="stat-label">📈 Weekly Average</div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px;">
+    <div class="card">
+        <h3 style="margin-top: 0; display: flex; align-items: center; gap: 10px;">
+            <span>📸</span> Quick Actions
+        </h3>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            <a href="/scan" class="btn btn-primary" style="text-align: center; padding: 16px;">📸 Start Biometric Scan</a>
+            <a href="/register" class="btn btn-secondary" style="text-align: center;">➕ Register New Staff</a>
+            <a href="/attendance" class="btn btn-secondary" style="text-align: center;">📋 View Attendance Logs</a>
+            <a href="/storage" class="btn btn-secondary" style="text-align: center;">💾 Manage Backup</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top: 0; display: flex; align-items: center; gap: 10px;">
+            <span>📊</span> System Status
+        </h3>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; justify-content: space-between; padding: 12px; background: var(--bg-dark); border-radius: 8px;">
+                <span>Face Recognition Engine</span>
+                <span style="color: var(--success);">✅ Active</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 12px; background: var(--bg-dark); border-radius: 8px;">
+                <span>Database Connection</span>
+                <span style="color: var(--success);">✅ Connected</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 12px; background: var(--bg-dark); border-radius: 8px;">
+                <span>Camera Access</span>
+                <span style="color: var(--success);">✅ Ready</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 12px; background: var(--bg-dark); border-radius: 8px;">
+                <span>Auto-Backup</span>
+                <span style="color: var(--success);">✅ Scheduled</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card" style="margin-top: 24px;">
+    <h3 style="margin-top: 0; display: flex; align-items: center; gap: 10px;">
+        <span>🎯</span> Getting Started
+    </h3>
+    <ol style="line-height: 2; color: var(--muted);">
+        <li><strong style="color: var(--text);">Register Staff:</strong> Go to <a href="/register" style="color: var(--accent);">Register Staff</a> and add employee details with face photos.</li>
+        <li><strong style="color: var(--text);">Biometric Scan:</strong> Use <a href="/scan" style="color: var(--accent);">Biometric Scan</a> to mark attendance by face recognition.</li>
+        <li><strong style="color: var(--text);">View Records:</strong> Check <a href="/attendance" style="color: var(--accent);">Attendance Logs</a> for time-in/time-out details.</li>
+        <li><strong style="color: var(--text);">Backup Data:</strong> Regularly backup your data from <a href="/storage" style="color: var(--accent);">Storage & Backup</a>.</li>
+    </ol>
+</div>
+{% endblock %}

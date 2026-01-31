@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Overview | VisionPresence Pro{% endblock %}
+{% block page_title %}📊 Overview{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">System Overview</div>
+    <div class="page-subtitle">Real-time statistics and system status</div>
+</div>
+
+<div class="grid">
+    <div class="stat-box">
+        <div class="stat-value">{{ total_staff }}</div>
+        <div class="stat-label">👥 Registered Staff</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-value">{{ today_present }}</div>
+        <div class="stat-label">✅ Present Today</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-value">{{ today_absent }}</div>
+        <div class="stat-label">❌ Absent Today</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-value">{{ week_attendance }}%</div>
+        <div class="stat-label">📈 Weekly Avg</div>
+    </div>
+</div>
+
+<div class="card">
+    <h2 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+        <span>🎯</span> Project Features
+    </h2>
+    <ul style="line-height: 2;">
+        <li>✅ AI-powered face recognition using advanced neural networks</li>
+        <li>✅ Automatic time-in and time-out tracking</li>
+        <li>✅ Eliminates proxy attendance and manual errors</li>
+        <li>✅ Real-time attendance dashboard and analytics</li>
+        <li>✅ Database backup and export functionality</li>
+        <li>✅ Secure biometric authentication system</li>
+        <li>✅ Comprehensive attendance logs and reports</li>
+    </ul>
+</div>
+
+<div class="card">
+    <h2 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+        <span>🧩</span> System Architecture
+    </h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+        <div style="padding: 12px; background: rgba(14, 165, 233, 0.1); border-radius: 8px;">
+            <div style="color: var(--accent); font-weight: 600; margin-bottom: 4px;">Frontend</div>
+            <div style="font-size: 13px; color: var(--muted);">HTML, CSS, JavaScript</div>
+        </div>
+        <div style="padding: 12px; background: rgba(14, 165, 233, 0.1); border-radius: 8px;">
+            <div style="color: var(--accent); font-weight: 600; margin-bottom: 4px;">Backend</div>
+            <div style="font-size: 13px; color: var(--muted);">Python Flask</div>
+        </div>
+        <div style="padding: 12px; background: rgba(14, 165, 233, 0.1); border-radius: 8px;">
+            <div style="color: var(--accent); font-weight: 600; margin-bottom: 4px;">AI/ML</div>
+            <div style="font-size: 13px; color: var(--muted);">Face Recognition</div>
+        </div>
+        <div style="padding: 12px; background: rgba(14, 165, 233, 0.1); border-radius: 8px;">
+            <div style="color: var(--accent); font-weight: 600; margin-bottom: 4px;">Database</div>
+            <div style="font-size: 13px; color: var(--muted);">SQLite 3.x</div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

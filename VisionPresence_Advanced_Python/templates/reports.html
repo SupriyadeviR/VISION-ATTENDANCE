@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>📑 Attendance Reports | Face Attendance AI</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <!-- Chart.js for graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<!-- 🔷 NAVBAR -->
+<div class="navbar">
+    <h1>🧠 Face Attendance AI</h1>
+    <ul>
+        <li><a href="/dashboard">🏠 Dashboard</a></li>
+        <li><a href="/overview">📘 Overview</a></li>
+        <li><a href="/scan">📷 Biometric Scan</a></li>
+        <li><a href="/attendance">📊 Attendance Logs</a></li>
+        <li><a href="/reports">📑 Reports</a></li>
+    </ul>
+</div>
+
+<!-- 🔷 MAIN CONTAINER -->
+<div class="container fade-in">
+
+    <h2>📑 Attendance Reports</h2>
+    <p>View overall staff attendance summary and generate reports</p>
+
+    <!-- 🔹 SUMMARY CARDS -->
+    <div class="dashboard-grid" style="margin-top:25px;">
+
+        <div class="card">
+            <h3>👥 Total Staff</h3>
+            <h1>{{ total_staff if total_staff else "—" }}</h1>
+        </div>
+
+        <div class="card">
+            <h3>✅ Present Today</h3>
+            <h1>{{ present_today if present_today else "—" }}</h1>
+        </div>
+
+        <div class="card">
+            <h3>❌ Absent Today</h3>
+            <h1>{{ absent_today if absent_today else "—" }}</h1>
+        </div>
+
+        <div class="card">
+            <h3>📊 Overall Attendance %</h3>
+            <h1>{{ attendance_percent if attendance_percent else "—" }}%</h1>
+        </div>
+
+    </div>
+
+    <!-- 🔹 ATTENDANCE CHART -->
+    <div class="card" style="margin-top:30px;">
+        <h3>📈 Monthly Attendance Chart</h3>
+        <canvas id="attendanceChart" style="max-height:400px;"></canvas>
+    </div>
+
+    <!-- 🔹 EXPORT BUTTONS -->
+    <div style="margin-top:25px;">
+        <a href="/export_csv"><button class="btn">⬇ Download CSV</button></a>
+        <a href="/export_pdf"><button class="btn">⬇ Download PDF</button></a>
+    </div>
+
+</div>
+
+<!-- 🔻 FOOTER -->
+<div class="footer">
+    © 2026 | AI-Based Face Recognition Attendance System 🚀
+</div>
+
+<!-- 🔹 CHART.JS SCRIPT -->
+<script>
+    const ctx = document.getElementById('attendanceChart').getContext('2d');
+
+    const attendanceChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ chart_labels|safe }},  // e.g., ["Jan","Feb","Mar"]
+            datasets: [{
+                label: 'Attendance %',
+                data: {{ chart_data|safe }},    // e.g., [90, 85, 95]
+                backgroundColor: 'rgba(33, 150, 243, 0.7)',
+                borderColor: 'rgba(33, 150, 243, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

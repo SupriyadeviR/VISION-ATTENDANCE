@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Staff Database | VisionPresence Pro{% endblock %}
+{% block page_title %}👥 Staff Database{% endblock %}
+
+{% block topbar_actions %}
+<a href="/register" class="btn btn-primary">➕ Register New Staff</a>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">Staff Management</div>
+    <div class="page-subtitle">View, edit, and manage registered staff members</div>
+</div>
+
+<div class="card">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Photo</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Department</th>
+                    <th>Gender</th>
+                    <th>DOB</th>
+                    <th>Native</th>
+                    <th>Joining Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if staff %}
+                    {% for s in staff %}
+                    <tr>
+                        <td>
+                            {% if s.image_path %}
+                                <img class="avatar" src="{{ url_for('uploaded_file', filename=s.image_path|basename) }}" alt="{{ s.name }}">
+                            {% else %}
+                                <div class="avatar" style="display:flex;align-items:center;justify-content:center;background:#334155;color:#f1f5f9">N/A</div>
+                            {% endif %}
+                        </td>
+                        <td><strong>{{ s.name }}</strong></td>
+                        <td>{{ s.email or '—' }}</td>
+                        <td>{{ s.phone or '—' }}</td>
+                        <td>{{ s.department or '—' }}</td>
+                        <td>{{ s.gender or '—' }}</td>
+                        <td>{{ s.dob or '—' }}</td>
+                        <td>{{ s.native or '—' }}</td>
+                        <td>{{ s.joining_date or '—' }}</td>
+                        <td>
+                            <a href="/delete_staff/{{ s.emp_id }}" onclick="return confirm('⚠ Delete {{ s.name }}? This action cannot be undone.');">
+                                <button class="btn btn-danger" style="padding: 6px 10px; font-size: 12px;">🗑 Delete</button>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="10" style="text-align: center; color: var(--muted); padding: 32px;">
+                        📭 No staff members registered yet. <a href="/register" style="color: var(--accent);">Register one now</a>
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance Logs | VisionPresence Pro{% endblock %}
+{% block page_title %}📋 Attendance Logs{% endblock %}
+
+{% block topbar_actions %}
+<a href="/export_attendance?format=excel" class="btn btn-success" title="Export to Excel">📊 Excel</a>
+<a href="/export_attendance?format=csv" class="btn btn-primary" title="Export to CSV">📥 CSV</a>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">Attendance Records</div>
+    <div class="page-subtitle">Complete history of employee check-ins and check-outs</div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+    <div style="padding: 16px; background: var(--card); border-radius: 12px; border-left: 4px solid var(--success);">
+        <div style="color: var(--muted); font-size: 12px; margin-bottom: 8px;">📊 Total Attendance Records</div>
+        <div style="font-size: 28px; font-weight: 700; color: var(--text);">{{ total_records }}</div>
+    </div>
+    <div style="padding: 16px; background: var(--card); border-radius: 12px; border-left: 4px solid var(--warning);">
+        <div style="color: var(--muted); font-size: 12px; margin-bottom: 8px;">👥 Unique Employees</div>
+        <div style="font-size: 28px; font-weight: 700; color: var(--text);">{{ unique_employees }}</div>
+    </div>
+    <div style="padding: 16px; background: var(--card); border-radius: 12px; border-left: 4px solid var(--accent);">
+        <div style="color: var(--muted); font-size: 12px; margin-bottom: 8px;">📅 Date Range</div>
+        <div style="font-size: 14px; font-weight: 600; color: var(--text);">Last 30 days</div>
+    </div>
+</div>
+
+<div class="card">
+    <div style="margin-bottom: 16px; display: flex; align-items: center; gap: 12px;">
+        <input type="text" id="searchInput" placeholder="🔍 Search by employee name..." style="flex: 1;">
+        <select id="filterStatus" style="min-width: 150px;">
+            <option value="">All Status</option>
+            <option value="Present">✅ Present</option>
+            <option value="Absent">❌ Absent</option>
+        </select>
+    </div>
+
+    <div class="table-wrap">
+        <table id="attendanceTable">
+            <thead>
+                <tr>
+                    <th>Employee ID</th>
+                    <th>Employee Name</th>
+                    <th>Date</th>
+                    <th>Time In</th>
+                    <th>Time Out</th>
+                    <th>Duration (Hours)</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if logs %}
+                    {% for log in logs %}
+                    <tr>
+                        <td><strong>#{{ log.emp_id }}</strong></td>
+                        <td>{{ log.name }}</td>
+                        <td>{{ log.attendance_date }}</td>
+                        <td>
+                            {% if log.time_in %}
+                                {{ log.time_in }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if log.time_out %}
+                                {{ log.time_out }}
+                            {% else %}
+                                <span style="color: var(--warning);">🔴 Active</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if log.duration is not none %}
+                                {{ log.duration }}h
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if log.status == 'Present' %}
+                                <span style="color: var(--success);">✅ Present</span>
+                            {% elif log.status == 'Absent' %}
+                                <span style="color: var(--danger);">❌ Absent</span>
+                            {% else %}
+                                <span style="color: var(--muted);">⚪ {{ log.status }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="7" style="text-align: center; color: var(--muted); padding: 32px;">
+                        📭 No attendance records found
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card">
+    <h3 style="margin-top: 0; display: flex; align-items: center; gap: 10px;">
+        <span>📊</span> Quick Statistics
+    </h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+        <div>
+            <div style="color: var(--muted); font-size: 12px; margin-bottom: 8px;">Average Daily Attendance</div>
+            <div style="font-size: 24px; font-weight: 700; color: var(--success);">{{ avg_attendance }}%</div>
+        </div>
+        <div>
+            <div style="color: var(--muted); font-size: 12px; margin-bottom: 8px;">Average Work Duration</div>
+            <div style="font-size: 24px; font-weight: 700; color: var(--accent);">{{ avg_duration }} h</div>
+        </div>
+        <div>
+            <div style="color: var(--muted); font-size: 12px; margin-bottom: 8px;">Peak Hours</div>
+            <div style="font-size: 24px; font-weight: 700; color: var(--warning);">09:00-17:00</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const filterStatus = document.getElementById('filterStatus');
+    const table = document.getElementById('attendanceTable');
+    const rows = table.querySelectorAll('tbody tr');
+
+    function filterTable() {
+        const searchText = searchInput.value.toLowerCase();
+        const statusFilter = filterStatus.value;
+
+        rows.forEach(row => {
+            const name = row.cells[1].textContent.toLowerCase();
+            const status = row.cells[6].textContent;
+            
+            const nameMatch = name.includes(searchText);
+            const statusMatch = !statusFilter || status.includes(statusFilter);
+            
+            row.style.display = (nameMatch && statusMatch) ? '' : 'none';
+        });
+    }
+
+    searchInput.addEventListener('keyup', filterTable);
+    filterStatus.addEventListener('change', filterTable);
+</script>
+{% endblock %}
+            color: white;
+            border-radius: 6px;
+        }
+        .top-bar a:hover {
+            background: #0056b3;
+        }
+
+        .flash {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .danger { background: #f8d7da; color: #721c24; }
+        .success { background: #d4edda; color: #155724; }
+        .warning { background: #fff3cd; color: #856404; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h2>📊 Attendance Logs</h2>
+
+    <div class="top-bar">
+        <a href="/dashboard">🏠 Dashboard</a>
+        <a href="/backup">💾 Export CSV</a>
+    </div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- SEARCH -->
+    <input type="text" id="search-input" placeholder="Search by staff name...">
+
+    <table id="attendance-table">
+        <thead>
+            <tr>
+                <th>Photo</th>
+                <th>Name</th>
+                <th>Employee ID</th>
+                <th>Department</th>
+                <th>Status</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr>
+                <td>
+                    {% if log.image_path %}
+                        <img src="{{ log.image_path }}" alt="Staff Image">
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+                <td>{{ log.name }}</td>
+                <td>{{ log.emp_id }}</td>
+                <td>{{ log.department }}</td>
+                <td class="status-{{ 'present' if log.status == 'Present' else 'absent' }}">
+                    {{ log.status }}
+                </td>
+                <td>{{ log.timestamp }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+<script>
+    // SEARCH FUNCTIONALITY
+    const searchInput = document.getElementById("search-input");
+    const table = document.getElementById("attendance-table").getElementsByTagName('tbody')[0];
+
+    searchInput.addEventListener("keyup", function() {
+        const filter = this.value.toLowerCase();
+        const rows = table.getElementsByTagName("tr");
+
+        for (let i = 0; i < rows.length; i++) {
+            const nameCell = rows[i].getElementsByTagName("td")[1];
+            if (nameCell) {
+                const txtValue = nameCell.textContent || nameCell.innerText;
+                rows[i].style.display = txtValue.toLowerCase().indexOf(filter) > -1 ? "" : "none";
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
